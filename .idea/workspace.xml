@@ -36,6 +36,7 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/templates/.AppleDouble/.Parent" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/templates/.AppleDouble/index.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/insta/views.py" afterPath="$PROJECT_DIR$/insta/views.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="instacoffee.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -63,7 +64,7 @@
         <entry file="file://$PROJECT_DIR$/insta/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.10909091" vertical-offset="0" max-vertical-offset="825">
-              <caret line="6" column="40" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
+              <caret line="6" column="42" selection-start-line="6" selection-start-column="42" selection-end-line="6" selection-end-column="42" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -281,7 +282,7 @@
     <entry file="file://$PROJECT_DIR$/insta/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.10909091" vertical-offset="0" max-vertical-offset="825">
-          <caret line="6" column="40" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
+          <caret line="6" column="42" selection-start-line="6" selection-start-column="42" selection-end-line="6" selection-end-column="42" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
           </folding>
