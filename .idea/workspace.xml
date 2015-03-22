@@ -2,6 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cc9753bc-23a0-425e-a11f-fe2c6b510cd8" name="Default" comment="">
+<<<<<<< HEAD
+=======
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.AppleDouble/README.md" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.AppleDouble/db.sqlite3" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.AppleDouble/manage.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.AppleDouble/wsgi.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/.name" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/encodings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/instacoffee.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/vcs.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.AppleDouble/workspace.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/scopes/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/scopes/.AppleDouble/scope_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/.AppleDouble/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/.AppleDouble/admin.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/.AppleDouble/models.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/.AppleDouble/tests.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/.AppleDouble/views.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/migrations/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/insta/migrations/.AppleDouble/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/.AppleDouble/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/.AppleDouble/settings.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/.AppleDouble/undefined" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/.AppleDouble/urls.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/.AppleDouble/wsgi.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/templates/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/instacoffee/templates/.AppleDouble/index.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/templates/.AppleDouble/.Parent" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/templates/.AppleDouble/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/insta/views.py" afterPath="$PROJECT_DIR$/insta/views.py" />
+>>>>>>> 6482ba58611e990a2ec7cb8ee732beb7daeb83cf
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="instacoffee.iws" />
@@ -29,8 +66,13 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/insta/views.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state vertical-scroll-proportion="-11.111111" vertical-offset="0" max-vertical-offset="390">
               <caret line="20" column="24" selection-start-line="20" selection-start-column="24" selection-end-line="20" selection-end-column="24" />
+=======
+            <state vertical-scroll-proportion="0.10909091" vertical-offset="0" max-vertical-offset="825">
+              <caret line="6" column="42" selection-start-line="6" selection-start-column="42" selection-end-line="6" selection-end-column="42" />
+>>>>>>> 6482ba58611e990a2ec7cb8ee732beb7daeb83cf
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -538,8 +580,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/insta/views.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state vertical-scroll-proportion="-11.111111" vertical-offset="0" max-vertical-offset="390">
           <caret line="20" column="24" selection-start-line="20" selection-start-column="24" selection-end-line="20" selection-end-column="24" />
+=======
+        <state vertical-scroll-proportion="0.10909091" vertical-offset="0" max-vertical-offset="825">
+          <caret line="6" column="42" selection-start-line="6" selection-start-column="42" selection-end-line="6" selection-end-column="42" />
+>>>>>>> 6482ba58611e990a2ec7cb8ee732beb7daeb83cf
           <folding>
             <element signature="e#0#36#0" expanded="true" />
           </folding>
