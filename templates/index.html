@@ -9,22 +9,32 @@
 
 <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
 <script type="text/javascript">
+
 $(document).ready(function() {
-            $("#button").click(function() {
-                    var input_string = $("#forminput").val();
-                    $.ajax({
-                        url : "/",
-                        type : "POST",
-                        dataType: "json",
-                        data : {
-                            client_response : input_string,
-                            csrfmiddlewaretoken: '{{ csrf_token }}'
-                            },
+            $('#power').change(function() {
+                var control_str
+                if($(this).is(":checked")) {
+                    control_str = "power_on";
 
-                    });
+                } else {
+                    control_str = "power_off";
+                }
 
-            });
-        });
+                $.ajax({
+                    url : "/",
+                    type : "POST",
+                    dataType: "json",
+                    data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+
+                });
+                $(this).attr("checked", returnVal);
+
+            })
+});
+
 </script>
 
 </head>
@@ -41,28 +51,21 @@ $(document).ready(function() {
 
             <p class="palatino">Power</p>
             <center>
-            <form method="POST">
             <div class="switch">
-            <input name="button" value="power" id="cmn-toggle-4" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-            <label for="cmn-toggle-4"></label>
+            <input name="power" id="power" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+            <label for="power">Power</label>
             </div>
-            </form>
             </center>
 
             <p class="palatino">Start Time</p>
-            <form method="post" name="example form" >
-             {% csrf_token %}
-             <input name="example" id="forminput" type="text">
-             <input id="button" type="button" value="send to server"></input>
-            </form>
-
             <p class="palatino">Shutdown Timer</p>
             <p class="palatino">Tweet when coffee is ready</p>
-            <p class="palatino">Coffie</p>
         </div>
 
         <div class="rightcol">
             <p class="palatino">Coffee pan present</p>
+
+
             <p class="palatino">Coffee is ready</p>
         </div>
 

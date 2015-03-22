@@ -15,6 +15,9 @@ def index(request):
 
     # HTTP-Posts are used from Ajax-buttons to control the Arduino
     elif request.method == 'POST':
-        if request.POST.has_key('client_response'):
-            x = request.POST['client_response']
-            ser.write(x)
+        if request.POST.has_key('command'):
+            x = request.POST['command']
+            if x == "power_on":
+                ser.write('0')
+            elif x == "power_off":
+                ser.write('1')
