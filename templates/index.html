@@ -1,37 +1,72 @@
+
 <html>
 <head>
 <title>Instacoffee</title>
 
-<style>
-</style>
+{% load staticfiles %}
 
-</head>
-
-<body>
+<link rel="stylesheet" type="text/css" href="{% static 'insta/style.css' %}" />
 
 <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("#nappi").click(function() {
+<script type="text/javascript">
+$(document).ready(function() {
+            $("#button").click(function() {
                     var input_string = $("#forminput").val();
                     $.ajax({
-                        url : "/on/",
+                        url : "/",
                         type : "POST",
                         dataType: "json",
                         data : {
                             client_response : input_string,
                             csrfmiddlewaretoken: '{{ csrf_token }}'
-                            }
+                            },
+
                     });
-                    return false;
+
             });
         });
 </script>
-<form method="post" name="example form" >
-        {% csrf_token %}
-        <input name="example" id="forminput" type="text">
-        <input id="nappi" type="button" value="Vilkuta lediä"></input>
-</form>
-<div id="result">
+
+</head>
+
+<body>
+
+    <center>
+    <img src="{% static "insta/images/otsikko.png" %}" alt="My image"/>
+
+    <br>
+
+    <div class="wrapper">
+        <div class="leftcol">
+
+            <p class="palatino">Power</p>
+            <center>
+            <form method="POST">
+            <div class="switch">
+            <input name="button" value="power" id="cmn-toggle-4" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+            <label for="cmn-toggle-4"></label>
+            </div>
+            </form>
+            </center>
+
+            <p class="palatino">Start Time</p>
+            <form method="post" name="example form" >
+             {% csrf_token %}
+             <input name="example" id="forminput" type="text">
+             <input id="button" type="button" value="send to server"></input>
+            </form>
+
+            <p class="palatino">Shutdown Timer</p>
+            <p class="palatino">Tweet when coffee is ready</p>
+            <p class="palatino">Coffie</p>
+        </div>
+
+        <div class="rightcol">
+            <p class="palatino">Coffee pan present</p>
+            <p class="palatino">Coffee is ready</p>
+        </div>
+
+    </div>
+</center>
 </body>
 </html>

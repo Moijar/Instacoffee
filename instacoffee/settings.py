@@ -19,6 +19,8 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.abspath('.'), 'templates'),
 )
 
+STATICFILES_DIRS = ( '/home/instacoffee/instacoffee/static/', )
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
