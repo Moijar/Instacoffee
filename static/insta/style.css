@@ -82,9 +82,3 @@ input.cmn-toggle-round-flat:checked + label:after {
   margin-left: 60px;
   background-color: #8ce196;
 }
-
-.switch-wrapper {
-  display: inline-block;
-  position: relative;
-  top: 3px;
-}

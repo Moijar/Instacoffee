@@ -1,13 +1,83 @@
+
 <html>
 <head>
 <title>Instacoffee</title>
 
-<style>
-</style>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'insta/style.css' %}" />
+
+<script type='text/javascript' src='http://code.jquery.com/jquery-1.8.2.js'></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+            $('#power').change(function() {
+                var control_str
+                if($(this).is(":checked")) {
+                    control_str = "power_on";
+
+                } else {
+                    control_str = "power_off";
+                }
+
+                $.ajax({
+                    url : "/",
+                    type : "POST",
+                    dataType: "json",
+                    data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+
+                });
+                $(this).attr("checked", returnVal);
+
+            })
+});
+
+</script>
 
 </head>
 
 <body>
-lol
+
+    <center>
+    <img src="{% static "insta/images/otsikko.png" %}" alt="My image"/>
+
+    <br>
+
+    <div class="wrapper">
+        <div class="leftcol">
+
+            <p class="palatino">Power</p>
+            <center>
+            <div class="switch">
+            <input name="power" id="power" class="cmn-toggle
+cmn-toggle-round-flat" type="checkbox">
+            <label for="power">Power</label>
+            </div>
+            </center>
+
+            <p class="palatino">Start Timer</p>
+	    <center>
+            <div class="switch">
+            <input name="start_timer" id="start_timer" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+            <label for="power">Start Timer</label>
+            </div>
+            </center>
+
+            <p class="palatino">Shutdown Timer</p>
+            <p class="palatino">Tweet when coffee is ready</p>
+        </div>
+
+        <div class="rightcol">
+            <p class="palatino">Coffee pan present</p>
+
+
+            <p class="palatino">Coffee is ready</p>
+        </div>
+
+    </div>
+</center>
 </body>
 </html>

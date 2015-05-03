@@ -6,7 +6,7 @@ import json
 import serial
 
 ttystring = '/dev/ttyACM0'
-ser = serial.Serial(ttystring, 9600)
+#ser = serial.Serial(ttystring, 9600)
 
 def index(request):
     # In case of GET-request load the site
