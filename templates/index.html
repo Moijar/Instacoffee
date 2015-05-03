@@ -33,7 +33,100 @@ $(document).ready(function() {
                 $(this).attr("checked", returnVal);
 
             })
+
+            $('#start_timer_switch').change(function() {
+                var control_str
+                if($(this).is(":checked")) {
+                    control_str =  "start_timer_on: " + document.getElementById('start_timer_textbox').value;
+
+                } else {
+                    control_str = "start_timer_off";
+                }
+
+                $.ajax({
+                    url : "/",
+                    type : "POST",
+                    dataType: "json",
+                    data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+
+                });
+                $(this).attr("checked", returnVal);
+
+            })
+
+            $('#shutdown_timer').change(function() {
+                var control_str
+                if($(this).is(":checked")) {
+                    control_str =  "shutdown_timer_on: " + document.getElementById('shutdown_timer_textbox').value;
+
+                } else {
+                    control_str = "shutdown_timer_off";
+                }
+
+                $.ajax({
+                    url : "/",
+                    type : "POST",
+                    dataType: "json",
+                    data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+
+                });
+                $(this).attr("checked", returnVal);
+
+            })
+
+            $('#tweet_switch').change(function() {
+                var control_str
+                if($(this).is(":checked")) {
+                    control_str = "tweet_switch_on";
+
+                } else {
+                    control_str = "tweet_switch_off";
+                }
+
+                $.ajax({
+                    url : "/",
+                    type : "POST",
+                    dataType: "json",
+                    data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+
+                });
+                $(this).attr("checked", returnVal);
+
+            })
 });
+
+
+// The loop is used to send the data from the text boxes every second
+var interval = 1000;  // 1000 = 1 second
+function repeat() {
+    var control_str =  "start_timer: " + document.getElementById('start_timer_textbox').value + "\nshutdown_timer: " +document.getElementById('shutdown_timer_textbox').value;
+    $.ajax({
+            type: 'POST',
+            url: '/',
+            data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            dataType: 'json',
+            success: function (data) {
+                    $('#hidden').val(data);// first set the value
+            },
+            complete: function (data) {
+                    // Schedule the next
+                    setTimeout(repeat, interval);
+            }
+    });
+}
+setTimeout(repeat, interval);
 
 </script>
 
@@ -58,22 +151,43 @@ $(document).ready(function() {
             </center>
 
             <p class="palatino">Start Timer</p>
-	    <center>
-            <div class="switch">
-            <input name="start_timer" id="start_timer" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-            <label for="power">Start Timer</label>
-            </div>
+	        <center>
+                <div class="switch">
+                    <input name="start_timer_switch" id="start_timer_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+                    <label for="start_timer_switch">Start Timer</label>
+                </div>
+
+                <br><br>
+                <input class="textbox" name="start_timer_textbox" type="text" value="12:00" id="start_timer_textbox">
             </center>
 
             <p class="palatino">Shutdown Timer</p>
+            <center>
+                <div class="switch">
+                    <input name="shutdown_timer" id="shutdown_timer" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+                    <label for="shutdown_timer">Shutdown Timer</label>
+                </div>
+
+                <br><br>
+                <input class="textbox" name="shutdown_timer_textbox" type="text" value="12:00" id="shutdown_timer_textbox">
+            </center>
+
             <p class="palatino">Tweet when coffee is ready</p>
+            <center>
+            <div class="switch">
+            <input name="tweet_switch" id="tweet_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+            <label for="tweet_switch">Shutdown Timer</label>
+            </div>
+            </center>
         </div>
 
         <div class="rightcol">
             <p class="palatino">Coffee pan present</p>
+            <div class="led led-red"></div>
 
 
             <p class="palatino">Coffee is ready</p>
+            <div class="led led-green"></div>
         </div>
 
     </div>
