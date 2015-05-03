@@ -7,7 +7,7 @@ import serial
 
 ttystring = '/dev/ttyACM0'
 #ser = serial.Serial(ttystring, 9600)
-
+# Mitä paskaa
 def index(request):
     # In case of GET-request load the site
     if request.method == 'GET':
