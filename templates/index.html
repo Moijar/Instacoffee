@@ -34,13 +34,13 @@ $(document).ready(function() {
 
             })
 
-            $('#start_timer_switch').change(function() {
+            $('#start_time_switch').change(function() {
                 var control_str
                 if($(this).is(":checked")) {
-                    control_str =  "start_timer_on: " + document.getElementById('start_timer_textbox').value;
+                    control_str =  "start_time_on";
 
                 } else {
-                    control_str = "start_timer_off";
+                    control_str = "start_time_off";
                 }
 
                 $.ajax({
@@ -60,7 +60,7 @@ $(document).ready(function() {
             $('#shutdown_timer').change(function() {
                 var control_str
                 if($(this).is(":checked")) {
-                    control_str =  "shutdown_timer_on: " + document.getElementById('shutdown_timer_textbox').value;
+                    control_str =  "shutdown_timer_on";
 
                 } else {
                     control_str = "shutdown_timer_off";
@@ -108,8 +108,11 @@ $(document).ready(function() {
 // The loop is used to send the data from the text boxes every second
 var interval = 1000;  // 1000 = 1 second
 function repeat() {
-    var control_str =  "start_timer: " + document.getElementById('start_timer_textbox').value + "\nshutdown_timer: " +document.getElementById('shutdown_timer_textbox').value;
+    var control_str =  "start_time: " + document.getElementById('start_time_textbox').value + "\nshutdown_timer: " +document.getElementById('shutdown_timer_textbox').value;
+
     $.ajax({
+
+
             type: 'POST',
             url: '/',
             data : {
@@ -124,6 +127,7 @@ function repeat() {
                     // Schedule the next
                     setTimeout(repeat, interval);
             }
+
     });
 }
 setTimeout(repeat, interval);
@@ -150,15 +154,15 @@ setTimeout(repeat, interval);
             </div>
             </center>
 
-            <p class="palatino">Start Timer</p>
+            <p class="palatino">Start Time</p>
 	        <center>
                 <div class="switch">
-                    <input name="start_timer_switch" id="start_timer_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-                    <label for="start_timer_switch">Start Timer</label>
+                    <input name="start_time_switch" id="start_time_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+                    <label for="start_time_switch">Start Time</label>
                 </div>
 
                 <br><br>
-                <input class="textbox" name="start_timer_textbox" type="text" value="12:00" id="start_timer_textbox">
+                <input class="textbox" name="start_time_textbox" type="text" value="12:00" id="start_time_textbox">
             </center>
 
             <p class="palatino">Shutdown Timer</p>
@@ -169,7 +173,7 @@ setTimeout(repeat, interval);
                 </div>
 
                 <br><br>
-                <input class="textbox" name="shutdown_timer_textbox" type="text" value="12:00" id="shutdown_timer_textbox">
+                <input class="textbox" name="shutdown_timer_textbox" type="text" value="02:00" id="shutdown_timer_textbox">
             </center>
 
             <p class="palatino">Tweet when coffee is ready</p>
@@ -186,7 +190,7 @@ setTimeout(repeat, interval);
             <div class="led led-red"></div>
 
 
-            <p class="palatino">Coffee is ready</p>
+            <p class="palatino">Coffee is ready in {{ message }}</p>
             <div class="led led-green"></div>
         </div>
 
