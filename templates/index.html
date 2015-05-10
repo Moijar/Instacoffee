@@ -111,28 +111,15 @@ $(document).ready(function() {
 
 // The loop is used to send the data from the text boxes every second
 var interval = 1000;  // 1000 = 1 second
-function repeat_post() {
-    var control_str =  "start_time: " + document.getElementById('start_time_textbox').value + "\nshutdown_timer: " +document.getElementById('shutdown_timer_textbox').value;
-
-    $.ajax({
-            type: 'POST',
-            url: '/',
-            data : {
-                        command : control_str,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            dataType: 'json',
-            success: function (data) {
-                    $('#hidden').val(data);// first set the value
-            },
-            complete: function (data) {
-                    // Schedule the next
-                    setTimeout(repeat_post, interval);
-            }
-
-    });
-}
-function repeat_get() {
+function repeat() {
+	str =  "start_time: " + document.getElementById('start_time_textbox').value;
+	$.get('/startTime/', {startT: str}, function(data){
+				if(data == "true") {
+					$('#power').prop('checked', true);
+				}
+               
+    })
+		   
 	str = "false"
 	$.get('/presence/', {presence: str}, function(data){
 				if(data == "true") {
@@ -143,12 +130,11 @@ function repeat_get() {
                     $('#presence_green').hide()
 					$('#presence_red').show()
                 }
-               setTimeout(repeat_get, interval);
            });
+	setTimeout(repeat, interval);
 };
 
-setTimeout(repeat_get, interval);
-setTimeout(repeat_post, interval);
+setTimeout(repeat, interval);
 
 </script>
 

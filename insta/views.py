@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import *
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 import serial
 import datetime
@@ -11,6 +13,7 @@ import json
 ttystring = '/dev/ttyACM0'
 ser = serial.Serial(ttystring, 9600)
 
+@csrf_exempt
 def index(request):
     with open('workfile') as data_file:
         data = json.load(data_file)
@@ -26,8 +29,9 @@ def index(request):
             x = request.POST['command']
             
             if x == "power_on":
-                ser.write('1')
-                print "power on"
+                if data["panPresence"] == "true": # Check that the pan is present before turning on
+                    ser.write('1')
+                    print "power on"
                     
                     
             elif x == "power_off":
@@ -59,11 +63,8 @@ def index(request):
                 current_hour = str(hour_int)
                 
                 # Compare the current time to start time. If it matches, turn the coffee maker on
-                if start_hour == current_hour and start_minute == current_minute and data["startTime"] == "on":
+                if start_hour == current_hour and start_minute == current_minute and data["startTime"] == "on" and data["panPresence"] == "true":
                     ser.write('1')
-                
-				
-
 
             elif x == "shutdown_timer:":
                 print x
@@ -81,19 +82,83 @@ def index(request):
             
             with open('workfile', 'w') as outfile:
                 json.dump(data, outfile)
-
+                
+@csrf_exempt
 def presence(request):
-    presence = "true"
+    with open('workfile') as data_file:
+        data = json.load(data_file)
+        
+    presence = data["panPresence"]
     sensitivity = 0.1
     # Find out the magnetometer value and determine the presence of the coffee pan accordingly
-    ser.write('3')
-    gauss_str = ser.readline()
-    gauss = float(gauss_str)
+    while (True):
+        ser.flush()
+        ser.write('3')
+        gauss_str = ser.readline()
+        gauss = float(gauss_str)
+        
+        if -0.1 < gauss < 0.5:
+            break
+    
+    print gauss
     
     if (gauss > sensitivity):
         presence = "true"
+        data["panPresence"] = "true"
     else:
         presence = "false"
+        data["panPresence"] = "false"
     
-    print gauss
+    with open('workfile', 'w') as outfile:
+                json.dump(data, outfile)
+                
     return HttpResponse(presence)
+
+@csrf_exempt    
+def startTime(request):
+    
+    with open('workfile') as data_file:
+        data = json.load(data_file)
+    
+    if request.GET.has_key('startT'):
+        # Parse the start time from 
+        x = request.GET['startT']
+        start_time = x.replace("start_time: ", "")
+        
+        # Check that the string is in correct format
+        if start_time.find(':') == -1:
+            with open('workfile', 'w') as outfile:
+                json.dump(data, outfile)
+                
+            return HttpResponse("false")
+        
+        (start_hour, start_minute) = start_time[:5].split(":")
+                
+        # Find out the current time
+        now = datetime.datetime.now()
+        current_hour = now.strftime("%H")
+        current_minute = now.strftime("%M")
+                
+       # Correct the time zone to Finland, Summer Time
+        hour_int = int(current_hour)+3
+                
+       # Convert hour back to string for comparison
+        current_hour = str(hour_int)
+                
+        # Compare the current time to start time. If it matches, turn the coffee maker on
+        
+        print start_hour + ":" + start_minute
+        
+        if start_hour == current_hour and start_minute == current_minute and data["startTime"] == "on" and data["panPresence"] == "true":
+            ser.flush()
+            ser.write('1')
+            
+            with open('workfile', 'w') as outfile:
+                json.dump(data, outfile)
+                
+            return HttpResponse("true")
+        
+        with open('workfile', 'w') as outfile:
+            json.dump(data, outfile)    
+                
+    return HttpResponse("false")
