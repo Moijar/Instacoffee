@@ -83,8 +83,6 @@ def index(request):
                 json.dump(data, outfile)
 
 def presence(request):
-    now = datetime.datetime.now()
-    today = now.strftime("%A, %b %d, %Y")
-    return {
-        "today": today
-    }
+    presence = "true"
+    print "lol"
+    return HttpResponse(presence)
