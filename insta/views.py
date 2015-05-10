@@ -66,12 +66,6 @@ def index(request):
                 if start_hour == current_hour and start_minute == current_minute and data["startTime"] == "on" and data["panPresence"] == "true":
                     ser.write('1')
 
-            elif x == "shutdown_timer:":
-                print x
-            
-            elif x == "shutdown_timer_off":
-                print x
-            
             elif x == "tweet_switch_on":
                 print x
             
@@ -162,3 +156,49 @@ def startTime(request):
             json.dump(data, outfile)    
                 
     return HttpResponse("false")
+    
+@csrf_exempt    
+def shutdownTimer(request):
+    if request.GET.has_key('shutdownT'):
+        # Parse the start time from 
+        x = request.GET['shutdownT']
+        shutdown_time = x.replace("shutdown_timer: ", "")
+        
+        # Check that the string is in correct format
+        if shutdown_time.find(':') == -1:
+            with open('workfile', 'w') as outfile:
+                json.dump(data, outfile)
+                
+            return HttpResponse("false")
+        
+        (shutdown_hour_str, shutdown_minute_str, shutdown_second_str) = shutdown_time[:8].split(":")
+        
+        
+        
+        shutdown_hour = int(shutdown_hour_str)
+        shutdown_minute = int(shutdown_minute_str)
+        shutdown_second = int(shutdown_second_str)
+        
+        if shutdown_second > 0:
+            shutdown_second = shutdown_second-1
+        else:
+            if shutdown_minute > 0:
+                shutdown_minute = shutdown_minute-1
+            else:
+                if shutdown_hour > 0:
+                    shutdown_hour = shutdown_hour-1
+                 
+                shutdown_minute = 59
+                 
+            shutdown_second = 59
+        
+        if shutdown_hour == 0 and shutdown_minute == 0 and shutdown_second == 0:
+            ser.write('0')
+            return HttpResponse("true")
+        
+        shutdown_hour_str = str(shutdown_hour)
+        shutdown_minute_str = str(shutdown_minute)
+        shutdown_second_str = str(shutdown_second)
+        
+        print shutdown_hour_str+shutdown_minute_str+shutdown_second_str
+        return HttpResponse(shutdown_hour_str+":"+shutdown_minute_str+":"+shutdown_second_str)

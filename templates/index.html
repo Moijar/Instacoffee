@@ -60,29 +60,6 @@ $(document).ready(function() {
 
             })
 
-            $('#shutdown_timer').change(function() {
-                var control_str
-                if($(this).is(":checked")) {
-                    control_str =  "shutdown_timer_on";
-
-                } else {
-                    control_str = "shutdown_timer_off";
-                }
-
-                $.ajax({
-                    url : "/",
-                    type : "POST",
-                    dataType: "json",
-                    data : {
-                        command : control_str,
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-
-                });
-                $(this).attr("checked", returnVal);
-
-            })
-
             $('#tweet_switch').change(function() {
                 var control_str
                 if($(this).is(":checked")) {
@@ -130,7 +107,18 @@ function repeat() {
                     $('#presence_green').hide()
 					$('#presence_red').show()
                 }
-           });
+    })
+		   
+	str =  "shutdown_timer: " + document.getElementById('shutdown_timer_textbox').value;
+	$.get('/shutdownTimer/', {shutdownT: str}, function(data){
+				if(data == "true") {
+					$('#power').removeAttr('checked');
+					$('#shutdown_timer_textbox').val("00:02:00");
+				} else {
+					$('#shutdown_timer_textbox').val(data);
+				}
+    })
+	
 	setTimeout(repeat, interval);
 };
 
@@ -171,13 +159,7 @@ setTimeout(repeat, interval);
 
             <p class="palatino">Shutdown Timer</p>
             <center>
-                <div class="switch">
-                    <input name="shutdown_timer" id="shutdown_timer" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-                    <label for="shutdown_timer">Shutdown Timer</label>
-                </div>
-
-                <br><br>
-                <input class="textbox" name="shutdown_timer_textbox" type="text" value="02:00" id="shutdown_timer_textbox">
+                <input class="textbox" name="shutdown_timer_textbox" type="text" value="00:00:20" id="shutdown_timer_textbox">
             </center>
 
             <p class="palatino">Tweet when coffee is ready</p>
