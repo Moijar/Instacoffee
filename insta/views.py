@@ -84,5 +84,16 @@ def index(request):
 
 def presence(request):
     presence = "true"
-    print "lol"
+    sensitivity = 0.1
+    # Find out the magnetometer value and determine the presence of the coffee pan accordingly
+    ser.write('3')
+    gauss_str = ser.readline()
+    gauss = float(gauss_str)
+    
+    if (gauss > sensitivity):
+        presence = "true"
+    else:
+        presence = "false"
+    
+    print gauss
     return HttpResponse(presence)
