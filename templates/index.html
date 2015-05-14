@@ -101,6 +101,7 @@ function repeat() {
 	
 	$.get('/presence/', function(data){
 				if(data == "true") {
+					
                     $('#presence_green').show()
 					$('#presence_red').hide()
 
@@ -110,6 +111,31 @@ function repeat() {
                 }
     })
 	
+	setTimeout(function() {}, 1000);
+	
+	str =  "shutdown_timer: " + document.getElementById('shutdown_timer_textbox').value;
+	$.get('/shutdownTimer/', {shutdownT: str}, function(data){
+				if(data == "true") {
+					$('#power').removeAttr('checked');
+				} /*else {
+					$('#shutdown_timer_textbox').val(data);
+				}*/
+	
+	})
+	
+	setTimeout(function() {}, 1000);
+	
+	$.get('/ready/', function(data){
+				if(data == "true") {
+					alert(data);
+                    $('#ready_green').show()
+					$('#ready_red').hide()
+
+                } else {
+                    $('#ready_green').hide()
+					$('#ready_red').show()
+                }
+    })
 	setTimeout(repeat, interval);
 };
 
@@ -156,7 +182,7 @@ setTimeout(repeat, interval);
 
             <p class="palatino">Shutdown Timer</p>
             <center>
-                <input class="textbox" name="shutdown_timer_textbox" type="text" value="00:00:20" id="shutdown_timer_textbox">
+                <input class="textbox" name="shutdown_timer_textbox" type="text" value="01:00" id="shutdown_timer_textbox">
             </center>
 
             <p class="palatino">Tweet when coffee is ready</p>

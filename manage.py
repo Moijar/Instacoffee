@@ -2,7 +2,7 @@
 import os
 import sys
 
-default_workfile = '{"loopOn": "false", "powerButton": "off", "startTimeButton": "off", "startTime": "12:00", "shutdownTimer": "00:30:00", "tweet": "off", "coffie": "off", "panPresence": "false", "coffeeReady": "false"}'
+default_workfile = '{"loopOn": "false", "powerButton": "off", "startTimeButton": "off", "startTime": "12:00", "shutdownTimer": "01:00", "turnOffTime": "", "tweet": "off", "coffie": "off", "panPresence": "false", "coffeeReady": "false", "ready": "false", "readyTime" : ""}'
 f = open('workfile', 'w')
 f.write(default_workfile)
 f.close()
