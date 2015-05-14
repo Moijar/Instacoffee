@@ -29,42 +29,20 @@ def index(request):
             x = request.POST['command']
             
             if x == "power_on":
-                if data["panPresence"] == "true": # Check that the pan is present before turning on
-                    ser.write('1')
-                    print "power on"
-                    
-                    
+                data["powerButton"] = "on"
+                print "power on"
+                
             elif x == "power_off":
-                ser.write('0')
+                data["powerButton"] = "off"
                 print "power off"
             
             elif x == "start_time_on":
-                data["startTime"] = "on"
+                data["startTimeButton"] = "on"
                 print x
             elif x == "start_time_off":
-                data["startTime"] = "off"
-                print x
-            elif x.startswith("start_time:"):
+                data["startTimeButton"] = "off"
                 print x
                 
-                # Parse the start time from 
-                start_time = x.replace("start_time: ", "")
-                (start_hour, start_minute) = start_time[:5].split(":")
-                
-                # Find out the current time
-                now = datetime.datetime.now()
-                current_hour = now.strftime("%H")
-                current_minute = now.strftime("%M")
-                
-                # Correct the time zone to Finland, Summer Time
-                hour_int = int(current_hour)+3
-                
-                # Convert hour back to string for comparison
-                current_hour = str(hour_int)
-                
-                # Compare the current time to start time. If it matches, turn the coffee maker on
-                if start_hour == current_hour and start_minute == current_minute and data["startTime"] == "on" and data["panPresence"] == "true":
-                    ser.write('1')
 
             elif x == "tweet_switch_on":
                 print x
@@ -76,32 +54,95 @@ def index(request):
             
             with open('workfile', 'w') as outfile:
                 json.dump(data, outfile)
+            
+            return HttpResponse (status=200)
+            
+@csrf_exempt
+def backendLoop(request):
+
+    with open('workfile') as data_file:
+        data = json.load(data_file)
+    
+    # Prevent more than one loop
+    if data["loopOn"] == "true":
+        return HttpResponse (status=200)
+    
+    while(True):
+        time.sleep(2)
+        print "backendloop"
+        
+        # Read the workfile status every second
+        with open('workfile') as data_file:
+            data = json.load(data_file)
+        
+        # Prevent more than one loop
+        data["loopOn"] = "true"
+        # Check pan presence
+        sensitivity = 0.1
+        # Find out the magnetometer value and determine the presence of the coffee pan accordingly
+        while (True):
+            ser.flush()
+            ser.write('3')
+            gauss_str = ser.readline()
+            gauss = float(gauss_str)
+        
+            if -0.1 < gauss < 0.5 and gauss != 0.0:
+                break
+        
+        print gauss
+    
+        if (gauss > sensitivity):
+            data["panPresence"] = "true"
+        
+        else:
+            data["panPresence"] = "false"
+        
+        if data["powerButton"] == "off":
+            ser.flush()
+            ser.write('0')
+        
+        elif data["powerButton"] == "on":
+            if data["panPresence"] == "true": # Check that the pan is present before turning on
+                ser.write('1')
+        
+        # Parse the start time from 
+        start_time = data["startTime"]
+        (start_hour, start_minute) = start_time[:5].split(":")
+          
+        # Find out the current time
+        now = datetime.datetime.now()
+        current_hour = now.strftime("%H")
+        current_minute = now.strftime("%M")
+             
+        # Correct the time zone to Finland, Summer Time
+        hour_int = int(current_hour)+3
+            
+        # Convert hour back to string for comparison
+        current_hour = str(hour_int)
+        
+        if start_hour == current_hour and start_minute == current_minute and data["startTimeButton"] == "on" and data["panPresence"] == "true":
+            ser.flush()
+            ser.write('1')
+            data["powerButton"] = "on"
+            
+            with open('workfile', 'w') as outfile:
+                json.dump(data, outfile)
+
+        
+        with open('workfile', 'w') as outfile:
+            json.dump(data, outfile)
                 
 @csrf_exempt
 def presence(request):
     with open('workfile') as data_file:
         data = json.load(data_file)
         
-    presence = data["panPresence"]
-    sensitivity = 0.1
-    # Find out the magnetometer value and determine the presence of the coffee pan accordingly
-    while (True):
-        ser.flush()
-        ser.write('3')
-        gauss_str = ser.readline()
-        gauss = float(gauss_str)
-        
-        if -0.1 < gauss < 0.5:
-            break
+    presence = data["panPresence"]  
     
-    print gauss
-    
-    if (gauss > sensitivity):
+    if data["panPresence"] == "true":
         presence = "true"
-        data["panPresence"] = "true"
     else:
         presence = "false"
-        data["panPresence"] = "false"
     
     with open('workfile', 'w') as outfile:
                 json.dump(data, outfile)
@@ -110,52 +151,52 @@ def presence(request):
 
 @csrf_exempt    
 def startTime(request):
+    print "lol0"
     
     with open('workfile') as data_file:
         data = json.load(data_file)
+    
+    print "lol1"
     
     if request.GET.has_key('startT'):
         # Parse the start time from 
         x = request.GET['startT']
         start_time = x.replace("start_time: ", "")
-        
+        print "lol2"
         # Check that the string is in correct format
         if start_time.find(':') == -1:
             with open('workfile', 'w') as outfile:
                 json.dump(data, outfile)
-                
-            return HttpResponse("false")
+            return HttpResponse("false", status=200)
+        
+        print "lol3"
+        start_time = x.replace("start_time: ", "")
+        
+        data["startTime"] = start_time
         
         (start_hour, start_minute) = start_time[:5].split(":")
-                
+        
         # Find out the current time
         now = datetime.datetime.now()
         current_hour = now.strftime("%H")
         current_minute = now.strftime("%M")
-                
-       # Correct the time zone to Finland, Summer Time
+             
+        # Correct the time zone to Finland, Summer Time
         hour_int = int(current_hour)+3
-                
-       # Convert hour back to string for comparison
-        current_hour = str(hour_int)
-                
-        # Compare the current time to start time. If it matches, turn the coffee maker on
-        
-        print start_hour + ":" + start_minute
-        
-        if start_hour == current_hour and start_minute == current_minute and data["startTime"] == "on" and data["panPresence"] == "true":
-            ser.flush()
-            ser.write('1')
             
+        # Convert hour back to string for comparison
+        current_hour = str(hour_int)
+        print "lol4"
+        if start_hour == current_hour and start_minute == current_minute and data["startTimeButton"] == "on" and data["panPresence"] == "true":
+            print "lol5"
             with open('workfile', 'w') as outfile:
                 json.dump(data, outfile)
-                
-            return HttpResponse("true")
+            return HttpResponse("true", status=200)
+           
+    with open('workfile', 'w') as outfile:
+        json.dump(data, outfile)    
         
-        with open('workfile', 'w') as outfile:
-            json.dump(data, outfile)    
-                
-    return HttpResponse("false")
+    return HttpResponse("false", status=200)
     
 @csrf_exempt    
 def shutdownTimer(request):

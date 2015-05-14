@@ -10,5 +10,6 @@ urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^presence/$', views.presence, name='presence'),
     url(r'^startTime/$', views.startTime, name='startTime'),
-    url(r'^shutdownTimer/$', views.shutdownTimer, name='shutdownTimer')
+    url(r'^shutdownTimer/$', views.shutdownTimer, name='shutdownTimer'),
+    url(r'^backendLoop/', views.backendLoop, name='backendLoop')
 )

@@ -87,7 +87,7 @@ $(document).ready(function() {
 
 
 // The loop is used to send the data from the text boxes every second
-var interval = 1000;  // 1000 = 1 second
+var interval = 5000;  // 1000 = 1 second
 function repeat() {
 	str =  "start_time: " + document.getElementById('start_time_textbox').value;
 	$.get('/startTime/', {startT: str}, function(data){
@@ -96,9 +96,10 @@ function repeat() {
 				}
                
     })
-		   
-	str = "false"
-	$.get('/presence/', {presence: str}, function(data){
+	
+	setTimeout(function() {}, 1000);
+	
+	$.get('/presence/', function(data){
 				if(data == "true") {
                     $('#presence_green').show()
 					$('#presence_red').hide()
@@ -108,20 +109,16 @@ function repeat() {
 					$('#presence_red').show()
                 }
     })
-		   
-	str =  "shutdown_timer: " + document.getElementById('shutdown_timer_textbox').value;
-	$.get('/shutdownTimer/', {shutdownT: str}, function(data){
-				if(data == "true") {
-					$('#power').removeAttr('checked');
-					$('#shutdown_timer_textbox').val("00:02:00");
-				} else {
-					$('#shutdown_timer_textbox').val(data);
-				}
-    })
 	
 	setTimeout(repeat, interval);
 };
 
+function backendLoop() {
+	$.get('/backendLoop/', function(data){
+    })
+};
+
+backendLoop();
 setTimeout(repeat, interval);
 
 </script>
