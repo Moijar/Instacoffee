@@ -83,6 +83,30 @@ $(document).ready(function() {
                 $(this).attr("checked", returnVal);
 
             })
+			
+			$('#coffie_switch').change(function() {
+                var control_str
+                if($(this).is(":checked")) {
+                    control_str = "coffie_switch_on";
+					
+
+                } else {
+                    control_str = "coffie_switch_off";
+                }
+
+                $.ajax({
+                    url : "/",
+                    type : "POST",
+                    dataType: "json",
+                    data : {
+                        command : control_str,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+
+                });
+                $(this).attr("checked", returnVal);
+
+            })
 });
 
 
@@ -127,7 +151,6 @@ function repeat() {
 	
 	$.get('/ready/', function(data){
 				if(data == "true") {
-					alert(data);
                     $('#ready_green').show()
 					$('#ready_red').hide()
 
@@ -189,7 +212,15 @@ setTimeout(repeat, interval);
             <center>
             <div class="switch">
             <input name="tweet_switch" id="tweet_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-            <label for="tweet_switch">Shutdown Timer</label>
+            <label for="tweet_switch">tweet</label>
+            </div>
+            </center>
+			
+			<p class="palatino">Coffie</p>
+            <center>
+            <div class="switch">
+            <input name="coffie_switch" id="coffie_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+            <label for="coffie_switch">coffie</label>
             </div>
             </center>
         </div>

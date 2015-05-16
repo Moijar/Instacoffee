@@ -2,7 +2,7 @@
 import os
 import sys
 
-default_workfile = '{"loopOn": "false", "powerButton": "off", "startTimeButton": "off", "startTime": "12:00", "shutdownTimer": "01:00", "turnOffTime": "", "tweet": "off", "coffie": "off", "panPresence": "false", "coffeeReady": "false", "ready": "false", "readyTime" : ""}'
+default_workfile = '{"loopOn": "false", "powerButton": "off", "startTimeButton": "off", "startTime": "12:00", "shutdownTimer": "01:00", "turnOffTime": "", "tweet": "off", "coffie": "off", "pictureTaken": "false", "panPresence": "false", "coffeeReady": "false", "ready": "false", "readyTime" : "", "consumer_key": "eO96ZowsEhEdmvpioGNBrQxzE", "consumer_secret": "nKPGmuSAVdK9UQV2h1jFcQ0fec4OLOlaDkTWdu8tbVkkKzZYWj","access_token": "1428460136-TSXqHkUqEzaepLpU7orUIwA6lZfyfRmLuurvUDB", "access_token_secret": "r7nk7u1yaFfsSZl8QdABHv9N7KpAi99qZOofVFBvz0CB0"}'
 f = open('workfile', 'w')
 f.write(default_workfile)
 f.close()

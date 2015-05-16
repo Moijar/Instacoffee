@@ -9,6 +9,8 @@ import serial
 import datetime
 import time
 import json
+import tweepy
+from subprocess import call
 
 ttystring = '/dev/ttyACM0'
 ser = serial.Serial(ttystring, 9600)
@@ -83,10 +85,20 @@ def index(request):
                 
 
             elif x == "tweet_switch_on":
+                data["tweet"] = "on"
                 print x
             
             elif x == "tweet_switch_off":
+                data["tweet"] = "off"
                 print x
+                
+            elif x == "coffie_switch_on":
+                data["coffie"] = "on"
+                print x
+            
+            elif x == "tweet_switch_off":
+                data["coffie"] = "off"
+                print x    
             else:
                 print x
             
@@ -97,48 +109,89 @@ def index(request):
             
 @csrf_exempt
 def backendLoop(request):
+    print "lol1"
 
     with open('workfile') as data_file:
         data = json.load(data_file)
+    
+    print "lol2"
     
     # Prevent more than one loop
     if data["loopOn"] == "true":
         return HttpResponse (status=200)
     
+    print "lol3"
+    
     while(True):
         time.sleep(2)
-        
+        print "lol4"
         # Read the workfile status every second
         with open('workfile') as data_file:
             data = json.load(data_file)
-                
+
+        print "lol5"            
+        
         # Prevent more than one loop
         #data["loopOn"] = "true"
         # Check pan presence
         gauss_sensitivity = 0.1
         # Find out the magnetometer value and determine the presence of the coffee pan accordingly
         while (True):
+            ser.flush()
             ser.write('3')
             gauss_str = ser.readline()
             gauss = float(gauss_str)
-            if -0.5 < gauss < 0.5 and gauss != 0.0:
+            if -0.5 < gauss < 2.0 and gauss != 0.0:
                 break
-    
+        
+        print "lol6"
+        
         if (gauss > gauss_sensitivity):
             data["panPresence"] = "true"
-        
+            
+            # The pan needs to be returned back to its position to take new picture
+            data["pictureTaken"] = "false"
+            
         else:
+            print "lol6.1"
+            
             data["panPresence"] = "false"
+            print "lol6.2"
+            # If pan is taken from its place and coffee is ready, take a picture and post it to twitter
+            if data["coffie"] == "on" and data["coffeeReady"] == "true" and data["pictureTaken"] == "false":
+                print "lol6.30"
+                cmd = 'raspistill -t 500 -w 1024 -h 768 -o pic.jpg'
+                print "lol6.31"
+                call ([cmd], shell=True)         #shoot the photo
+                print "lol6.32"
+                photo_path = "pic.jpg"
+                print "lol6.33"
+                status = "Join them for coffee! :)"
+                print "lol6.34"
+                auth = tweepy.OAuthHandler(data["consumer_key"], data["consumer_secret"])
+                auth.set_access_token(data["access_token"], data["access_token_secret"])
+                api = tweepy.API(auth)
+                api.update_with_media(photo_path, status=status)
+                print "lol6.35"
+                
+                data["pictureTaken"] = "true"
+            
+        
+        print "lol7"
         
         # Parse the start time from 
         start_time = data["startTime"]
         (start_hour, start_minute) = start_time[:5].split(":")
-          
+        
+        print "lol7.1"
+        
         # Find out the current time
         now = datetime.datetime.now()
         current_hour = now.strftime("%H")
         current_minute = now.strftime("%M")
-             
+        
+        print "lol7.2"
+        
         # Correct the time zone to Finland, Summer Time
         hour_int = int(current_hour)+3        
         
@@ -152,6 +205,8 @@ def backendLoop(request):
         
         if smaller:
             current_hour = "0" + current_hour
+        
+        print "lol8"
         
         # Check if the time is the same as with turnOffTime
         if data["turnOffTime"] == current_hour + ":" + current_minute:
@@ -169,6 +224,7 @@ def backendLoop(request):
         current_hour_int = int(current_hour) 
         current_minute_int = int(current_minute) 
         
+        print "lol9"
         
         # Start time
         if start_hour == current_hour and start_minute == current_minute and data["startTimeButton"] == "on" and data["panPresence"] == "true":
@@ -191,7 +247,9 @@ def backendLoop(request):
             turnOff_minute_str = str(turnOff_minute)
         
             data["turnOffTime"] = turnOff_hour_str + ":" + turnOff_minute_str
-           
+        
+        print "lol10"
+         
         # Power button off
         if data["powerButton"] == "off":
             data["coffeeReady"] = "false"
@@ -204,21 +262,27 @@ def backendLoop(request):
             if data["panPresence"] == "true": # Check that the pan is present before turning on
                 ser.flush()
                 ser.write('1')
-                
+                print "lol11"
                 # Determine the time when coffee will be ready
-                distance_sensitivity = 10
+                distance_sensitivity = 9
                 minutesToReady = 0
         
                 values = []
+                print "lol12"
                 while len(values) < 10:
+                    print "lol13"
+                    ser.flush()
                     ser.write('4')
                     distance_str = ser.readline()
                     distance = float(distance_str)
-                    values.append(distance)
+                    if (5 < distance):
+                        values.append(distance)
                         
                 # Calculate the average of 10 distance values
                 average = sum(values)/float(len(values))
-        
+                print values
+                print "average: " + str(average)
+                
                 if average > distance_sensitivity and data["readyTime"] == "":
                     ready_minute = current_minute_int + minutesToReady
                     ready_hour = current_hour_int
@@ -240,11 +304,20 @@ def backendLoop(request):
                         ready_minute_str = "0" + ready_minute_str
                         
                     data["readyTime"] = ready_hour_str + ":" + ready_minute_str
-        
+        print "lol14"
         # Check if the coffee is ready now
         if data["readyTime"] == current_hour + ":" + current_minute and data["coffeeReady"] == "false":
             data["coffeeReady"] = "true"
             print "yes ready"
+            
+            if  data["tweet"] == "on":
+                auth = tweepy.OAuthHandler(data["consumer_key"], data["consumer_secret"])
+                auth.set_access_token(data["access_token"], data["access_token_secret"])
+                api = tweepy.API(auth)
+                api.update_status(status="Coffee is ready! Join me for a hot cup! :)")
+                print "TWITTERED!"
+        
+        print "lol15"
         
         with open('workfile', 'w') as outfile:
             json.dump(data, outfile)
@@ -253,18 +326,8 @@ def backendLoop(request):
 def presence(request):
     with open('workfile') as data_file:
         data = json.load(data_file)
-        
-    presence = data["panPresence"]  
-    
-    if data["panPresence"] == "true":
-        presence = "true"
-    else:
-        presence = "false"
-    
-    with open('workfile', 'w') as outfile:
-                json.dump(data, outfile)
-                
-    return HttpResponse(presence, status=200)
+
+    return HttpResponse(data["panPresence"], status=200)
 
 @csrf_exempt    
 def startTime(request):  
