@@ -187,7 +187,11 @@ setTimeout(repeat, interval);
             <p class="palatino">Power</p>
             <center>
             <div class="switch">
-            <input name="power" id="power" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+			{% if powerButton == "off" %}
+				<input name="power" id="power" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+			{% else %}
+				<input name="power" id="power" class="cmn-toggle cmn-toggle-round-flat" type="checkbox" checked>
+			{% endif %}
             <label for="power">Power</label>
             </div>
             </center>
@@ -195,31 +199,44 @@ setTimeout(repeat, interval);
             <p class="palatino">Start Time</p>
 	        <center>
                 <div class="switch">
+				{% if startTimeButton == "off" %}
                     <input name="start_time_switch" id="start_time_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-                    <label for="start_time_switch">Start Time</label>
+				{% else %}
+					<input name="start_time_switch" id="start_time_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox" checked>
+                {% endif %}
+				
+				<label for="start_time_switch">Start Time</label>
                 </div>
 
                 <br><br>
-                <input class="textbox" name="start_time_textbox" type="text" value="12:00" id="start_time_textbox">
+                <input class="textbox" name="start_time_textbox" type="text" value={{ startTime }} id="start_time_textbox">
             </center>
 
             <p class="palatino">Shutdown Timer</p>
             <center>
-                <input class="textbox" name="shutdown_timer_textbox" type="text" value="01:00" id="shutdown_timer_textbox">
-            </center>
+                <input class="textbox" name="shutdown_timer_textbox" type="text" value={{ shutdownTimer }} id="shutdown_timer_textbox">			
+			</center>
 
             <p class="palatino">Tweet when coffee is ready</p>
             <center>
             <div class="switch">
-            <input name="tweet_switch" id="tweet_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
-            <label for="tweet_switch">tweet</label>
+			{% if tweet == "off" %}
+				<input name="tweet_switch" id="tweet_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+			{% else %}
+				<input name="tweet_switch" id="tweet_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox" checked>
+            {% endif %}
+			<label for="tweet_switch">tweet</label>
             </div>
             </center>
 			
 			<p class="palatino">Coffie</p>
             <center>
             <div class="switch">
-            <input name="coffie_switch" id="coffie_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+			{% if coffie == "off" %}
+				<input name="coffie_switch" id="coffie_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox">
+			{% else %}
+				<input name="coffie_switch" id="coffie_switch" class="cmn-toggle cmn-toggle-round-flat" type="checkbox" checked>
+			{% endif %}
             <label for="coffie_switch">coffie</label>
             </div>
             </center>

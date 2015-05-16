@@ -11,32 +11,32 @@ import time
 import json
 import tweepy
 from subprocess import call
+from insta.models import coffeeMaker
 
 ttystring = '/dev/ttyACM0'
 ser = serial.Serial(ttystring, 9600)
 
 @csrf_exempt
 def index(request):
-    with open('workfile') as data_file:
-        data = json.load(data_file)
-    
-    print data["startTime"]
     # In case of GET-request load the site
     if request.method == 'GET':
-        return render_to_response('index.html', {}, context_instance=RequestContext(request))
+        device = coffeeMaker.objects.filter(name='Insta').get()
+        
+        return render_to_response('index.html', {"powerButton": device.powerButton, "startTimeButton": device.startTimeButton, "startTime": device.startTime, "shutdownTimer": device.shutdownTimer, "tweet": device.tweet, "coffie": device.coffie, "panPresence": device.panPresence, "coffeeReady": device.coffeeReady}, context_instance=RequestContext(request))
 
     # HTTP-Posts are used from Ajax-buttons to control the Arduino. The template is sending POST-requests to the view at least once every second, so this is also used as the loop function.
     elif request.method == 'POST':
         if request.POST.has_key('command'):
             x = request.POST['command']
+            device = coffeeMaker.objects.filter(name='Insta').get()
             
             if x == "power_on":
-                data["powerButton"] = "on"
+                device.powerButton = "on"
                 print "power on"
                 
                 # Shutdown timer
         
-                shutdown_time = data["shutdownTimer"]
+                shutdown_time = device.shutdownTimer
                 (shutdown_hour_str, shutdown_minute_str) = shutdown_time[:8].split(":")
 
                 shutdown_hour = int(shutdown_hour_str)
@@ -67,72 +67,68 @@ def index(request):
                     turnOff_hour = turnOff_hour - 24
             
                 turnOff_hour_str = str(turnOff_hour)
-                turnOff_minute_str = str(turnOff_minute)
+                turnOff_minute_str = str(turnOff_minute)      
+        
+                smaller = False
+        
+                if turnOff_minute < 10:
+                    turnOff_minute_str = "0" + turnOff_minute_str
                 
-                data["turnOffTime"] = turnOff_hour_str + ":" + turnOff_minute_str
+                if turnOff_hour < 10:
+                    turnOff_hour_str = "0" + turnOff_hour_str
+                
+                device.turnOffTime = turnOff_hour_str + ":" + turnOff_minute_str
                 
                 
             elif x == "power_off":
-                data["powerButton"] = "off"
+                device.powerButton = "off"
                 print "power off"
             
             elif x == "start_time_on":
-                data["startTimeButton"] = "on"
+                device.startTimeButton = "on"
                 print x
             elif x == "start_time_off":
-                data["startTimeButton"] = "off"
+                device.startTimeButton = "off"
                 print x
                 
 
             elif x == "tweet_switch_on":
-                data["tweet"] = "on"
+                device.tweet = "on"
                 print x
             
             elif x == "tweet_switch_off":
-                data["tweet"] = "off"
+                device.tweet = "off"
                 print x
                 
             elif x == "coffie_switch_on":
-                data["coffie"] = "on"
+                device.coffie = "on"
                 print x
             
             elif x == "tweet_switch_off":
-                data["coffie"] = "off"
+                device.coffie = "off"
                 print x    
             else:
                 print x
             
-            with open('workfile', 'w') as outfile:
-                json.dump(data, outfile)
+            device.save()
             
             return HttpResponse (status=200)
             
 @csrf_exempt
 def backendLoop(request):
-    print "lol1"
+    device = coffeeMaker.objects.filter(name='Insta').get()
 
-    with open('workfile') as data_file:
-        data = json.load(data_file)
-    
-    print "lol2"
-    
     # Prevent more than one loop
-    if data["loopOn"] == "true":
+    if device.loopOn == "true":
         return HttpResponse (status=200)
     
-    print "lol3"
-    
+    time.sleep(2)
     while(True):
-        time.sleep(2)
-        print "lol4"
-        # Read the workfile status every second
-        with open('workfile') as data_file:
-            data = json.load(data_file)
-
-        print "lol5"            
+        time.sleep(1)
+        device = coffeeMaker.objects.filter(name='Insta').get() 
         
         # Prevent more than one loop
-        #data["loopOn"] = "true"
+        device.loopOn = "true"
         # Check pan presence
         gauss_sensitivity = 0.1
         # Find out the magnetometer value and determine the presence of the coffee pan accordingly
@@ -144,53 +140,38 @@ def backendLoop(request):
             if -0.5 < gauss < 2.0 and gauss != 0.0:
                 break
         
-        print "lol6"
-        
         if (gauss > gauss_sensitivity):
-            data["panPresence"] = "true"
+            device.panPresence = "true"
             
             # The pan needs to be returned back to its position to take new picture
-            data["pictureTaken"] = "false"
+            device.pictureTaken = "false"
             
         else:
-            print "lol6.1"
             
-            data["panPresence"] = "false"
-            print "lol6.2"
+            device.panPresence = "false"
             # If pan is taken from its place and coffee is ready, take a picture and post it to twitter
-            if data["coffie"] == "on" and data["coffeeReady"] == "true" and data["pictureTaken"] == "false":
-                print "lol6.30"
+            if device.coffie == "on" and device.coffeeReady == "true" and device.pictureTaken == "false":
                 cmd = 'raspistill -t 500 -w 1024 -h 768 -o pic.jpg'
-                print "lol6.31"
                 call ([cmd], shell=True)         #shoot the photo
-                print "lol6.32"
                 photo_path = "pic.jpg"
-                print "lol6.33"
-                status = "Join them for coffee! :)"
-                print "lol6.34"
-                auth = tweepy.OAuthHandler(data["consumer_key"], data["consumer_secret"])
-                auth.set_access_token(data["access_token"], data["access_token_secret"])
+                status = "Join them for coffee! :)" + current_hour + ":" + current_minute + " " + current_day + "." + current_month + "." + current_year
+                auth = tweepy.OAuthHandler(device.consumer_key, device.consumer_secret)
+                auth.set_access_token(device.access_token, device.access_token_secret)
                 api = tweepy.API(auth)
-                api.update_with_media(photo_path, status=status)
-                print "lol6.35"
-                
-                data["pictureTaken"] = "true"
+                api.update_with_media(photo_path, status=status)           
+                device.pictureTaken = "true"
             
-        
-        print "lol7"
-        
         # Parse the start time from 
-        start_time = data["startTime"]
+        start_time = device.startTime
         (start_hour, start_minute) = start_time[:5].split(":")
-        
-        print "lol7.1"
         
         # Find out the current time
         now = datetime.datetime.now()
         current_hour = now.strftime("%H")
         current_minute = now.strftime("%M")
-        
-        print "lol7.2"
+        current_year = now.strftime("%Y")
+        current_day = now.strftime("%d")
+        current_month = now.strftime("%m")
         
         # Correct the time zone to Finland, Summer Time
         hour_int = int(current_hour)+3        
@@ -206,16 +187,14 @@ def backendLoop(request):
         if smaller:
             current_hour = "0" + current_hour
         
-        print "lol8"
-        
         # Check if the time is the same as with turnOffTime
-        if data["turnOffTime"] == current_hour + ":" + current_minute:
+        if device.turnOffTime == current_hour + ":" + current_minute:
             ser.flush()
             ser.write('0')
-            data["powerButton"] = "off"
+            device.powerButton = "off"
         
         # Shutdown timer
-        shutdown_time = data["shutdownTimer"]
+        shutdown_time = device.shutdownTimer
         (shutdown_hour_str, shutdown_minute_str) = shutdown_time[:8].split(":")
 
         shutdown_hour = int(shutdown_hour_str)
@@ -224,13 +203,11 @@ def backendLoop(request):
         current_hour_int = int(current_hour) 
         current_minute_int = int(current_minute) 
         
-        print "lol9"
-        
         # Start time
-        if start_hour == current_hour and start_minute == current_minute and data["startTimeButton"] == "on" and data["panPresence"] == "true":
+        if start_hour == current_hour and start_minute == current_minute and device.startTimeButton == "on" and device.panPresence == "true":
             ser.flush()
             ser.write('1')
-            data["powerButton"] = "on"
+            device.powerButton = "on"
             
             # Set the time for turning the coffee maker off
             
@@ -246,31 +223,28 @@ def backendLoop(request):
             turnOff_hour_str = str(turnOff_hour)
             turnOff_minute_str = str(turnOff_minute)
         
-            data["turnOffTime"] = turnOff_hour_str + ":" + turnOff_minute_str
-        
-        print "lol10"
+            device.turnOffTime = turnOff_hour_str + ":" + turnOff_minute_str
          
         # Power button off
-        if data["powerButton"] == "off":
-            data["coffeeReady"] = "false"
-            data["readyTime"] = ""
+        if device.powerButton == "off":
+            device.coffeeReady = "false"
+            device.readyTime = ""
             ser.flush()
             ser.write('0')
         
         # Power button on
-        elif data["powerButton"] == "on":
-            if data["panPresence"] == "true": # Check that the pan is present before turning on
+        elif device.powerButton == "on":
+            if device.panPresence == "true": # Check that the pan is present before turning on
                 ser.flush()
                 ser.write('1')
-                print "lol11"
+                
                 # Determine the time when coffee will be ready
                 distance_sensitivity = 9
                 minutesToReady = 0
         
                 values = []
-                print "lol12"
+                
                 while len(values) < 10:
-                    print "lol13"
                     ser.flush()
                     ser.write('4')
                     distance_str = ser.readline()
@@ -283,7 +257,7 @@ def backendLoop(request):
                 print values
                 print "average: " + str(average)
                 
-                if average > distance_sensitivity and data["readyTime"] == "":
+                if average > distance_sensitivity and device.readyTime == "":
                     ready_minute = current_minute_int + minutesToReady
                     ready_hour = current_hour_int
             
@@ -303,36 +277,31 @@ def backendLoop(request):
                     if int(ready_minute_str) < 10:
                         ready_minute_str = "0" + ready_minute_str
                         
-                    data["readyTime"] = ready_hour_str + ":" + ready_minute_str
-        print "lol14"
+                    device.readyTime = ready_hour_str + ":" + ready_minute_str
+        
         # Check if the coffee is ready now
-        if data["readyTime"] == current_hour + ":" + current_minute and data["coffeeReady"] == "false":
-            data["coffeeReady"] = "true"
+        if device.readyTime == current_hour + ":" + current_minute and device.coffeeReady == "false":
+            device.coffeeReady = "true"
             print "yes ready"
             
-            if  data["tweet"] == "on":
-                auth = tweepy.OAuthHandler(data["consumer_key"], data["consumer_secret"])
-                auth.set_access_token(data["access_token"], data["access_token_secret"])
+            if  device.tweet == "on":
+                print "TWITTERED 1"
+                auth = tweepy.OAuthHandler(device.consumer_key, device.consumer_secret)
+                auth.set_access_token(device.access_token, device.access_token_secret)
                 api = tweepy.API(auth)
-                api.update_status(status="Coffee is ready! Join me for a hot cup! :)")
-                print "TWITTERED!"
+                api.update_status(status = "Coffee is ready on! Join me for a hot cup! :) " + current_hour + ":" + current_minute + " " + current_day + "." + current_month + "." + current_year)
+                print "TWITTERED! 2"
         
-        print "lol15"
+        device.save()
         
-        with open('workfile', 'w') as outfile:
-            json.dump(data, outfile)
-                
 @csrf_exempt
 def presence(request):
-    with open('workfile') as data_file:
-        data = json.load(data_file)
-
-    return HttpResponse(data["panPresence"], status=200)
+    device = coffeeMaker.objects.filter(name='Insta').get()
+    return HttpResponse(device.panPresence, status=200)
 
 @csrf_exempt    
 def startTime(request):  
-    with open('workfile') as data_file:
-        data = json.load(data_file)
+    device = coffeeMaker.objects.filter(name='Insta').get()
 
     if request.GET.has_key('startT'):
         # Parse the start time from 
@@ -341,13 +310,11 @@ def startTime(request):
 
         # Check that the string is in correct format
         if start_time.find(':') == -1:
-            with open('workfile', 'w') as outfile:
-                json.dump(data, outfile)
             return HttpResponse("false", status=200)
         
         start_time = x.replace("start_time: ", "")
         
-        data["startTime"] = start_time
+        device.startTime = start_time
         
         (start_hour, start_minute) = start_time[:5].split(":")
         
@@ -362,13 +329,11 @@ def startTime(request):
         # Convert hour back to string for comparison
         current_hour = str(hour_int)
         
-        if start_hour == current_hour and start_minute == current_minute and data["startTimeButton"] == "on" and data["panPresence"] == "true":
-            with open('workfile', 'w') as outfile:
-                json.dump(data, outfile)
+        if start_hour == current_hour and start_minute == current_minute and device.startTimeButton == "on" and device.panPresence == "true":
+            device.save()
             return HttpResponse("true", status=200)
            
-    with open('workfile', 'w') as outfile:
-        json.dump(data, outfile)    
+    device.save()   
         
     return HttpResponse("false", status=200)
     
@@ -384,13 +349,11 @@ def shutdownTimer(request):
         if shutdown_time.find(':') == -1:
             return HttpResponse("false")
         
-        with open('workfile') as data_file:
-            data = json.load(data_file)
+        device = coffeeMaker.objects.filter(name='Insta').get()
         
-        data["shutdownTimer"] = shutdown_time
+        device.shutdownTimer = shutdown_time
         
-        with open('workfile', 'w') as outfile:
-            json.dump(data, outfile)
+        device.save()
             
         # Find out the current time
         now = datetime.datetime.now()
@@ -407,14 +370,12 @@ def shutdownTimer(request):
             
         # Convert hour back to string for comparison
         current_hour = str(hour_int)
-        if data["turnOffTime"] == current_hour + ":" + current_minute:
+        if device.turnOffTime == current_hour + ":" + current_minute:
             return HttpResponse("true")
         
         return HttpResponse(status=200)
 
 @csrf_exempt        
 def ready(request):
-    with open('workfile') as data_file:
-        data = json.load(data_file)
-
-    return HttpResponse(data["coffeeReady"], status=200)
+    device = coffeeMaker.objects.filter(name='Insta').get()
+    return HttpResponse(device.coffeeReady, status=200)
